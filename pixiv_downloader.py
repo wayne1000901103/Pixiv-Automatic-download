@@ -56,7 +56,7 @@ def get_user_illusts(user_id, phpsessid):
     return list(data.get("body", {}).get("illusts", {}).keys())
 
 # 下載 Pixiv 圖片
-def download_pixiv_image(image_id, user_id, phpsessid, history):
+def download_pixiv_image(image_id, user_id, phpsessid, history, text_widget):
     global is_paused, current_downloading_file
     headers = {"Referer": f"https://www.pixiv.net/artworks/{image_id}", "User-Agent": "Mozilla/5.0"}
     cookies = {"PHPSESSID": phpsessid}
@@ -78,7 +78,8 @@ def download_pixiv_image(image_id, user_id, phpsessid, history):
 
     # 跳過已下載的圖片
     if image_id in history.get(str(user_id), []):
-        print(f"跳過已下載: {filename}")
+        text_widget.insert(tk.END, f"跳過已下載: {filename}\n")
+        text_widget.yview(tk.END)  # 滾動到最底部
         return
 
     # 記錄目前正在下載的圖片
@@ -92,11 +93,13 @@ def download_pixiv_image(image_id, user_id, phpsessid, history):
                 if is_paused:
                     f.close()
                     os.remove(filename)  # 刪除未完成的圖片
-                    print(f"下載暫停，刪除未完成的圖片: {filename}")
+                    text_widget.insert(tk.END, f"下載暫停，刪除未完成的圖片: {filename}\n")
+                    text_widget.yview(tk.END)
                     return
                 f.write(chunk)
 
-        print(f"已下載: {filename}")
+        text_widget.insert(tk.END, f"已下載: {filename}\n")
+        text_widget.yview(tk.END)
 
         # 更新下載紀錄
         if str(user_id) not in history:
@@ -120,7 +123,7 @@ def toggle_pause():
         current_downloading_file = None
 
 # 開始下載
-def start_download():
+def start_download(text_widget):
     global download_thread
     if download_thread and download_thread.is_alive():
         messagebox.showwarning("提示", "下載進行中，請勿重複開始")
@@ -147,16 +150,19 @@ def start_download():
         history = load_download_history()
 
         for user_id in user_ids:
-            print(f"獲取用戶 {user_id} 的作品...")
+            text_widget.insert(tk.END, f"獲取用戶 {user_id} 的作品...\n")
+            text_widget.yview(tk.END)
+
             illusts = get_user_illusts(user_id, phpsessid)
             if not illusts:
-                print(f"用戶 {user_id} 無作品")
+                text_widget.insert(tk.END, f"用戶 {user_id} 無作品\n")
+                text_widget.yview(tk.END)
                 continue
 
             for illust_id in illusts:
                 while is_paused:
                     time.sleep(1)  # 暫停時等待
-                download_pixiv_image(illust_id, user_id, phpsessid, history)
+                download_pixiv_image(illust_id, user_id, phpsessid, history, text_widget)
                 time.sleep(1)  # 避免封鎖
 
         messagebox.showinfo("完成", "所有圖片下載完成")
@@ -168,11 +174,19 @@ def start_download():
 # 建立 UI
 window = tk.Tk()
 window.title("Pixiv 用戶作品下載器")
+window.geometry("600x400")  # 更改視窗大小
 
-start_button = tk.Button(window, text="開始下載", command=start_download)
+label = tk.Label(window, text="請選擇 PHPSESSID 和用戶 ID 檔案", font=("Arial", 10))
+label.pack(pady=10)
+
+start_button = tk.Button(window, text="開始下載", command=lambda: start_download(text_widget), bg="blue", fg="white", font=("Arial", 12))
 start_button.pack(pady=10)
 
-pause_button = tk.Button(window, text="暫停下載", command=toggle_pause)
+pause_button = tk.Button(window, text="暫停下載", command=toggle_pause, bg="gray", fg="white", font=("Arial", 12))
 pause_button.pack(pady=10)
+
+# 增加顯示下載過程的文本框
+text_widget = tk.Text(window, height=10, width=70, font=("Arial", 10), wrap=tk.WORD)
+text_widget.pack(pady=10)
 
 window.mainloop()
