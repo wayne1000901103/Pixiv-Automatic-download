@@ -1,72 +1,61 @@
-Pixiv 用戶作品下載器
+# Pixiv 用戶作品下載器
 
-這是一個 Python 應用程式，能夠自動下載 Pixiv 用戶的所有公開作品。
+這是一個用來從 Pixiv 下載用戶作品的 Python 程式。你可以使用此程式來下載特定用戶的所有插畫，並將它們保存到本地。該程式支持手動暫停和恢復下載，以及避免重複下載。
 
-特色功能
+## 功能
 
-✅ 自動下載 Pixiv 用戶的所有作品
-✅ 支援 PHPSESSID 登入（無需 API）
-✅ 下載到 Windows 的圖片資料夾
-✅ 支援暫停 / 恢復下載
-✅ 避免重複下載
-✅ 下載未完成時暫停，會自動刪除該圖片
+- **下載 Pixiv 用戶的所有插畫**
+- **支持手動暫停和恢復下載**
+- **避免重複下載圖片**
+- **下載途中自動刪除未完成的圖片**
+- **可選擇存儲位置，並自動設置為「我的圖片」資料夾**
 
-📥 安裝與運行
+## 使用方式
 
-1. 安裝 Python（若尚未安裝）
+1. **安裝需求**
+   - 你需要安裝 Python 3.x，並且需要安裝以下 Python 函式庫：
+     ```bash
+     pip install requests
+     ```
 
-請前往 Python 官網 下載並安裝 Python。
+2. **準備**
+   - **Pixiv PHPSESSID**：你需要從瀏覽器中獲取 **PHPSESSID**，用來驗證你的身份。
+   - **用戶 ID 檔案**：準備一個文本檔案，裡面寫入你想下載的 Pixiv 用戶 ID，每行一個 ID。
 
-2. 安裝必要的函式庫
+3. **執行程式**
+   - 下載並運行 `pixiv_downloader.py`。
+   - 運行後，程式會要求你選擇 **PHPSESSID 檔案** 和 **用戶 ID 檔案**。
+   - 點擊「開始下載」來啟動下載過程。
+   - 點擊「暫停下載」來暫停下載，並刪除未完成的圖片，點擊「恢復下載」來繼續。
 
-在命令提示字元（CMD）或 PowerShell 中執行：
+4. **下載存儲**
+   - 所有下載的圖片將存儲在「我的圖片」資料夾下的 `Pixiv_Downloads` 資料夾中。
+   - 每個用戶的圖片會被存放在一個獨立的資料夾中。
 
-pip install requests tkinter
+## 範例
 
-3. 準備 PHPSESSID 與用戶 ID 檔案
+假設你有以下的用戶 ID 檔案 `user_ids.txt`，內容如下：
 
-取得 PHPSESSID
+```
+123456
+789012
+345678
+```
 
-登入 Pixiv 網站。
+然後，將 Pixiv 下載器執行，選擇 **PHPSESSID 檔案** 和 **user_ids.txt**，程式會開始從 Pixiv 下載這些用戶的插畫。
 
-在瀏覽器開發者工具 (F12) > 應用程式 (Application) > 儲存的 Cookie (Cookies) > pixiv.net，找到 PHPSESSID。
+下載的圖片將會存儲在以下路徑：
+```
+C:\Users\你的名稱\Pictures\Pixiv_Downloads\123456\
+    ├── 98765432.jpg
+    ├── 87654321.jpg
+    └── ...
+```
 
-將 PHPSESSID 複製到一個文字檔案（例如 phpsessid.txt）。
+## 注意事項
 
-建立用戶 ID 檔案
+- **PHPSESSID** 是需要手動從瀏覽器中獲取的，這是用來驗證你的 Pixiv 帳號的。
+- 如果下載途中按下「暫停下載」，程式會刪除未完成的圖片，並等待恢復。
+- 每次下載的圖片都會記錄在本地，並避免重複下載。
 
-在 Pixiv 找到你想下載的用戶。
-
-用戶 ID 在網址中，例如 https://www.pixiv.net/users/12345678，則 用戶 ID 為 12345678。
-
-將所有用戶 ID 存入 user_ids.txt，每行一個 ID。
-
-🚀 使用方法
-
-運行程式
-
-python pixiv_downloader.py
-
-選擇 phpsessid.txt 檔案。
-
-選擇 user_ids.txt 檔案。
-
-下載將自動開始！
-
-📌 可隨時按「暫停下載」，未完成的圖片會自動刪除。
-
-📂 下載位置
-
-所有圖片將會下載到 Windows 圖片 資料夾內，
-
-範例：
-
-C:\Users\你的名稱\Pictures\Pixiv_Downloads\用戶ID\
-
-⚠ 注意事項
-
-本工具僅用於個人備份 Pixiv 作品，請勿用於非法用途。
-
-若 PHPSESSID 失效，請重新取得新的 PHPSESSID。
-
-建議不要頻繁下載，以免被 Pixiv 暫時封鎖。
+---
